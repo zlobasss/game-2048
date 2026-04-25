@@ -2,11 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class HelloWorld2D extends JPanel {
+public class Main extends JPanel {
 
     private static double scale = 5;
 
-    public HelloWorld2D() {
+    public Main() {
         Timer timer = new Timer(8, (ActionEvent e) -> {
             update();
             repaint();
@@ -36,16 +36,16 @@ public class HelloWorld2D extends JPanel {
 
         g2d.scale(scale, scale);
 
-        g2d.drawRoundRect(x, y, size, size, 10, 10);
+        g2d.drawRect(x, y, size, size);
     }
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        HelloWorld2D panel = new HelloWorld2D();
+
+        Main panel = new Main();
         panel.setPreferredSize(new Dimension(400, 400));
-        
+
         frame.add(panel);
         frame.pack();
         frame.setResizable(false);
