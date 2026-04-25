@@ -1,21 +1,74 @@
 import javax.swing.*;
+import models.Grid;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class Main extends JPanel {
 
-    private static double scale = 5;
+    private static double scale = 2;
+
+    private Grid grid = new Grid(4);
+    private boolean gameOver = false;
 
     public Main() {
-        Timer timer = new Timer(8, (ActionEvent e) -> {
+
+        setFocusable(true);
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_UP:
+                        handleMove(3);
+                        break;
+
+                    case KeyEvent.VK_DOWN:
+                        handleMove(4);
+                        break;
+
+                    case KeyEvent.VK_LEFT:
+                        handleMove(1);
+                        break;
+
+                    case KeyEvent.VK_RIGHT:
+                        handleMove(2);
+                        break;
+
+                    case KeyEvent.VK_R:
+                        if (gameOver) {
+                            grid = new Grid(4);
+                            gameOver = false;
+                        }
+                        break;
+                }
+            }
+        });
+
+        Timer timer = new Timer(16, (ActionEvent e) -> {
             update();
             repaint();
         });
         timer.start();
     }
 
-    private void update() {
+    private void handleMove(int dir) {
 
+        if (gameOver)
+            return;
+
+        grid.move(dir);
+
+        if (!grid.canMove()) {
+            gameOver = true;
+        }
+    }
+
+    private void update() {
+        // логика игры
     }
 
     @Override
@@ -24,26 +77,28 @@ public class Main extends JPanel {
 
         Graphics2D g2d = (Graphics2D) g;
 
-        g2d.setColor(Color.BLUE);
+        grid.draw(g2d, scale);
 
-        int panelWidth = getWidth();
-        int panelHeight = getHeight();
+        if (gameOver) {
 
-        int size = 70;
+            g2d.setColor(new Color(0, 0, 0, 150));
+            g2d.fillRect(0, 0, getWidth(), getHeight());
 
-        int x = (int) ((panelWidth / scale - size) / 2);
-        int y = (int) ((panelHeight / scale - size) / 2);
+            g2d.setColor(Color.WHITE);
+            g2d.setFont(new Font("Arial", Font.BOLD, 30));
 
-        g2d.scale(scale, scale);
-
-        g2d.drawRect(x, y, size, size);
+            g2d.drawString("GAME OVER", 100, 180);
+            g2d.drawString("Press R to restart", 70, 220);
+        }
     }
 
     public static void main(String[] args) {
+
         JFrame frame = new JFrame("Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Main panel = new Main();
+
         panel.setPreferredSize(new Dimension(400, 400));
 
         frame.add(panel);
@@ -51,5 +106,7 @@ public class Main extends JPanel {
         frame.setResizable(false);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
+        SwingUtilities.invokeLater(panel::requestFocusInWindow);
     }
 }
